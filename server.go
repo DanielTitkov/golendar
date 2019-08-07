@@ -29,6 +29,5 @@ func operate(s ev.Storage) {
 func main() {
 	s := ev.MapStorage{}
 	s.Init()
-
 	operate(&s)
 }
