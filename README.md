@@ -1,4 +1,4 @@
-# GOlendar
+# Golendar
 
 Simple calendar web app written in Go.
 
@@ -12,10 +12,10 @@ Use `go run main.go` to start server without installation
 
 **Get all events**
 
-Method: GET
-Example: `GET /events HTTP/1.1`
+Method: GET  
+Example: `GET /events HTTP/1.1`  
 
-Sample result: 
+Sample result:   
 
 ```json
 [
@@ -42,10 +42,10 @@ Sample result:
 
 **Create event**
 
-Method: POST
-Example: `POST /events HTTP/1.1`
+Method: POST  
+Example: `POST /events HTTP/1.1`  
 
-Provide event data as JSON:
+Provide event data as JSON:  
 
 ```json
 {
@@ -57,15 +57,15 @@ Provide event data as JSON:
 
 **Update event**
 
-Method: PUT
-Params: UUID (required)
-Example: `PUT /events?UUID=3405be29-2852-44fa-b8c1-5c5be22d0c0f HTTP/1.1`
+Method: PUT  
+Params: UUID (required)  
+Example: `PUT /events?UUID=3405be29-2852-44fa-b8c1-5c5be22d0c0f HTTP/1.1`  
 
 Provide event data as JSON. Note that all field will be updated, not only the field present in provided JSON. If there is no event with the provided UUID, it will be created. 
 
 **Delete event**
 
-Method: DELETE
-Params: UUID (required)
-Example: `DELETE /events?UUID=3405be29-2852-44fa-b8c1-5c5be22d0c0f HTTP/1.1`
+Method: DELETE  
+Params: UUID (required)  
+Example: `DELETE /events?UUID=3405be29-2852-44fa-b8c1-5c5be22d0c0f HTTP/1.1`  
 
