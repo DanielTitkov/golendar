@@ -2,13 +2,13 @@
 
 Simple calendar web app written in Go.
 
-### How to use
+## How to use
 
 Use `go run main.go` to start server without installation
 
-### API
+## API
 
-#### Endpoint /events 
+### Endpoint /events 
 
 **Get all events**
 
