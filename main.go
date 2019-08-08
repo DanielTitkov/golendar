@@ -2,8 +2,9 @@ package main
 
 import (
 	"github.com/DanielTitkov/golendar/api"
+	"github.com/DanielTitkov/golendar/config"
 	"github.com/DanielTitkov/golendar/internal"
-	lg "github.com/DanielTitkov/golendar/logger"
+	"github.com/DanielTitkov/golendar/logger"
 )
 
 func mockEvents(s internal.Storage) {
@@ -18,13 +19,25 @@ func mockEvents(s internal.Storage) {
 }
 
 func main() {
-	logger, err := lg.CreateLogger("./logger.json")
+	// setup logger
+	l, err := logger.CreateLogger("./logger.json")
 	if err != nil {
 		panic(err)
 	}
-	s := internal.MapStorage{}
-	s.Init()
-	mockEvents(&s)
-	logger.Info("Server started")
-	api.HTTPHandleRequests(&s, logger)
+
+	// load config from file
+	c, err := config.LoadYamlConfig("./config.yaml")
+	if err != nil {
+		l.Fatalf("config is not loaded: %v", err)
+	}
+
+	// setup storage
+	s, err := internal.PrepareStorage(c)
+	if err != nil {
+		l.Fatal(err)
+	}
+
+	mockEvents(s)
+	l.Infof("Server started. Listening on port %s, using '%s' storage", c.Port, c.Storage)
+	api.HTTPHandleRequests(s, l)
 }
