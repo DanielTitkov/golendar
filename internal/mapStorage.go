@@ -2,6 +2,7 @@ package internal
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/google/uuid"
 )
@@ -41,6 +42,9 @@ func (mapStorage *MapStorage) GetUserEvents(user string) ([]Event, error) {
 
 // CreateEvent generates uuid for event object and saves it to storage
 func (mapStorage *MapStorage) CreateEvent(e Event) (Event, error) {
+	var mutex = &sync.Mutex{}
+	mutex.Lock()
+	defer mutex.Unlock()
 	e.UUID = uuid.New()
 	mapStorage.M[e.UUID] = e
 	return e, nil
@@ -48,6 +52,9 @@ func (mapStorage *MapStorage) CreateEvent(e Event) (Event, error) {
 
 // UpdateEvent rewrites event with given UUID
 func (mapStorage *MapStorage) UpdateEvent(eventUUID uuid.UUID, e Event) (Event, error) {
+	var mutex = &sync.Mutex{}
+	mutex.Lock()
+	defer mutex.Unlock()
 	e.UUID = eventUUID
 	mapStorage.M[eventUUID] = e
 	return e, nil
@@ -55,6 +62,9 @@ func (mapStorage *MapStorage) UpdateEvent(eventUUID uuid.UUID, e Event) (Event, 
 
 // DeleteEvent deletes event with given UUID from storage
 func (mapStorage *MapStorage) DeleteEvent(eventUUID uuid.UUID) error {
+	var mutex = &sync.Mutex{}
+	mutex.Lock()
+	defer mutex.Unlock()
 	delete(mapStorage.M, eventUUID)
 	return nil
 }
