@@ -61,7 +61,7 @@ Method: PUT
 Params: UUID (required)  
 Example: `PUT /events?UUID=3405be29-2852-44fa-b8c1-5c5be22d0c0f HTTP/1.1`  
 
-Provide event data as JSON. Note that all field will be updated, not only the field present in provided JSON. If there is no event with the provided UUID, it will be created. 
+Provide event data as JSON. Note that all fields will be updated, not only the fields present in provided JSON. If there is no event with the provided UUID, one will be created. 
 
 **Delete event**
 
