@@ -1,4 +1,4 @@
-package internal
+package event
 
 import (
 	"github.com/google/uuid"

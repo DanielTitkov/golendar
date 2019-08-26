@@ -1,16 +1,17 @@
-package api
+package rest
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/DanielTitkov/golendar/internal"
+	"github.com/DanielTitkov/golendar/internal/event"
+	"github.com/DanielTitkov/golendar/internal/storage"
 	"go.uber.org/zap"
 )
 
-func httpCreateEvent(w http.ResponseWriter, r *http.Request, s internal.Storage, l *zap.SugaredLogger) {
+func httpCreateEvent(w http.ResponseWriter, r *http.Request, s storage.Storage, l *zap.SugaredLogger) {
 	decoder := json.NewDecoder(r.Body)
-	var e internal.Event
+	var e event.Event
 	if err := decoder.Decode(&e); err != nil {
 		l.Errorf("JSON decoding failed: %v", err)
 		return
@@ -31,7 +32,7 @@ func httpCreateEvent(w http.ResponseWriter, r *http.Request, s internal.Storage,
 	}
 }
 
-func httpUpdateEvent(w http.ResponseWriter, r *http.Request, s internal.Storage, l *zap.SugaredLogger) {
+func httpUpdateEvent(w http.ResponseWriter, r *http.Request, s storage.Storage, l *zap.SugaredLogger) {
 	eventUUID, err := parseUUID(*r.URL)
 	if err != nil {
 		httpRespond(w, http.StatusBadRequest, "UUID is not provided or valid UUID")
@@ -42,7 +43,7 @@ func httpUpdateEvent(w http.ResponseWriter, r *http.Request, s internal.Storage,
 	l.Infof("update requested for event %v", eventUUID)
 
 	decoder := json.NewDecoder(r.Body)
-	var e internal.Event
+	var e event.Event
 	if err := decoder.Decode(&e); err != nil {
 		l.Errorf("JSON decoding failed: %v", err)
 		return
@@ -65,7 +66,7 @@ func httpUpdateEvent(w http.ResponseWriter, r *http.Request, s internal.Storage,
 	}
 }
 
-func httpGetEvents(w http.ResponseWriter, r *http.Request, s internal.Storage, l *zap.SugaredLogger) {
+func httpGetEvents(w http.ResponseWriter, r *http.Request, s storage.Storage, l *zap.SugaredLogger) {
 	events, err := s.GetEvents()
 	if err != nil {
 		l.Error(err)
@@ -76,7 +77,7 @@ func httpGetEvents(w http.ResponseWriter, r *http.Request, s internal.Storage, l
 	}
 }
 
-func httpDeleteEvent(w http.ResponseWriter, r *http.Request, s internal.Storage, l *zap.SugaredLogger) {
+func httpDeleteEvent(w http.ResponseWriter, r *http.Request, s storage.Storage, l *zap.SugaredLogger) {
 	eventUUID, err := parseUUID(*r.URL)
 	if err != nil {
 		httpRespond(w, http.StatusBadRequest, "UUID is not provided or valid UUID")

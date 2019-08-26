@@ -1,19 +1,22 @@
-package internal
+package storage
 
 import (
 	"errors"
 
 	"github.com/DanielTitkov/golendar/config"
+	"github.com/DanielTitkov/golendar/internal/event"
+	mapstorage "github.com/DanielTitkov/golendar/internal/storage/map"
+
 	"github.com/google/uuid"
 )
 
 // Storage has all methods for storing events in some kind of storage
 type Storage interface {
-	GetEvent(eventUUID uuid.UUID) (Event, error)
-	GetEvents() ([]Event, error)
-	GetUserEvents(user string) ([]Event, error)
-	CreateEvent(e Event) (Event, error)
-	UpdateEvent(eventUUID uuid.UUID, e Event) (Event, error)
+	GetEvent(eventUUID uuid.UUID) (event.Event, error)
+	GetEvents() ([]event.Event, error)
+	GetUserEvents(user string) ([]event.Event, error)
+	CreateEvent(e event.Event) (event.Event, error)
+	UpdateEvent(eventUUID uuid.UUID, e event.Event) (event.Event, error)
 	DeleteEvent(eventUUID uuid.UUID) error
 }
 
@@ -21,7 +24,7 @@ type Storage interface {
 func PrepareStorage(c config.Config) (Storage, error) {
 	switch c.Storage {
 	case "MapStorage":
-		s := MapStorage{}
+		s := mapstorage.MapStorage{}
 		s.Init()
 		return &s, nil
 	default:
