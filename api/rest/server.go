@@ -16,16 +16,16 @@ func requestLogger(handler http.Handler, l *zap.SugaredLogger) http.Handler {
 		})
 }
 
-func eventEndpointHandler(w http.ResponseWriter, r *http.Request, s storage.Storage, l *zap.SugaredLogger) {
+func eventEndpointHandler(h eventHandler, w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		httpGetEvents(w, r, s, l)
+		h.httpGetEvents(w, r)
 	case "POST":
-		httpCreateEvent(w, r, s, l)
+		h.httpCreateEvent(w, r)
 	case "PUT":
-		httpUpdateEvent(w, r, s, l)
+		h.httpUpdateEvent(w, r)
 	case "DELETE":
-		httpDeleteEvent(w, r, s, l)
+		h.httpDeleteEvent(w, r)
 	default:
 		httpRespond(w, http.StatusMethodNotAllowed, "Method not allowed")
 	}
@@ -33,9 +33,8 @@ func eventEndpointHandler(w http.ResponseWriter, r *http.Request, s storage.Stor
 
 // HTTPHandleRequests sets up routes and starts server
 func HTTPHandleRequests(s storage.Storage, l *zap.SugaredLogger) {
+	eh := eventHandler{s, l}
 	mux := http.DefaultServeMux
-	http.HandleFunc("/events", func(w http.ResponseWriter, r *http.Request) {
-		eventEndpointHandler(w, r, s, l)
-	})
+	http.HandleFunc("/events", func(w http.ResponseWriter, r *http.Request) { eventEndpointHandler(eh, w, r) })
 	l.Fatal(http.ListenAndServe(":3000", requestLogger(mux, l)))
 }
