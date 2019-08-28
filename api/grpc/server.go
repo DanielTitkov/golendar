@@ -47,7 +47,7 @@ func (srv *eventServer) CreateEvent(ctx context.Context, req *pb.CreateEventRequ
 
 func (srv *eventServer) UpdateEvent(ctx context.Context, req *pb.UpdateEventRequest) (*pb.UpdateEventResponse, error) {
 	e := req.GetEvent()
-	eventUUID, err := uuid.Parse(e.EventUUID)
+	eventUUID, err := uuid.Parse(req.GetEventUUID())
 	if err != nil {
 		return &pb.UpdateEventResponse{Status: "error occured: " + err.Error()}, nil
 	}
