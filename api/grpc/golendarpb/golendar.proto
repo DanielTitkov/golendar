@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package golendar;
+
+option go_package = "golendarpb";
+
+service EventService {
+    rpc GetEvent (GetEventRequest) returns (GetEventResponse);
+    rpc CreateEvent (CreateEventRequest) returns (CreateEventResponse);
+    rpc UpdateEvent (UpdateEventRequest) returns (UpdateEventResponse);
+    rpc DeleteEvent (DeleteEventRequest) returns (DeleteEventResponse);
+}
+
+message Event {
+    string eventUUID = 1;
+    string title = 2;
+    string datetime = 3;
+    string duration = 4;
+    string desc = 5;
+    string user = 6;
+    string notify = 7;
+}
+
+message GetEventRequest {
+    repeated string eventUUID = 1;
+    string user = 2;
+}
+
+message GetEventResponse {
+    string status = 1;
+    repeated Event event = 2;
+}
+
+message CreateEventRequest {
+    Event event = 1;
+}
+
+message CreateEventResponse {
+    string status = 1;
+    Event event = 2; 
+}
+
+message UpdateEventRequest {
+    string eventUUID = 1;
+    Event event = 2; 
+}
+
+message UpdateEventResponse {
+    string status = 1;
+    Event event = 2; 
+}
+
+message DeleteEventRequest {
+    string eventUUID = 1;
+}
+
+message DeleteEventResponse {
+    string status = 1;
+}
+
+

@@ -1,6 +1,10 @@
 package main
 
 import (
+	"net"
+	"sync"
+
+	"github.com/DanielTitkov/golendar/api/grpc"
 	"github.com/DanielTitkov/golendar/api/rest"
 	"github.com/DanielTitkov/golendar/config"
 	"github.com/DanielTitkov/golendar/internal/event"
@@ -33,12 +37,30 @@ func main() {
 	}
 
 	// setup storage
+	l.Infof("Using '%s' storage", c.Storage)
 	s, err := storage.PrepareStorage(c)
 	if err != nil {
 		l.Fatal(err)
 	}
 
 	mockEvents(s)
-	l.Infof("Server started. Listening on port %s, using '%s' storage", c.Port, c.Storage)
-	rest.HTTPHandleRequests(s, l)
+
+	var wg sync.WaitGroup
+
+	// start REST API server
+	wg.Add(1)
+	l.Infof("REST Server started. Listening on port %s", c.Port)
+	go rest.HTTPHandleRequests(s, l)
+
+	// start GRPC server
+	wg.Add(1)
+	lis, err := net.Listen("tcp", c.Host+":"+c.GRPCPort)
+	if err != nil {
+		l.Fatal(err)
+	}
+	l.Infof("GRPC Server started. Listening on %s:%s", c.Host, c.GRPCPort)
+	grpcServer := grpc.NewGolendarGRPCServer(s)
+	go grpcServer.Serve(lis)
+
+	wg.Wait()
 }

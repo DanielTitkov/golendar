@@ -8,8 +8,10 @@ import (
 
 // Config contains general app settings
 type Config struct {
-	Port    string `yaml:"port"`
-	Storage string `yaml:"storage"`
+	Host     string `yamp:"host"`
+	Port     string `yaml:"port"`
+	GRPCPort string `yaml:"grpcport"`
+	Storage  string `yaml:"storage"`
 }
 
 // LoadYamlConfig loads config from yaml file to struct
