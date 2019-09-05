@@ -1,4 +1,5 @@
 host: "0.0.0.0"
 port: 3000
 grpcport: 50051
-storage: "MapStorage"
+storage: "Postgres" # or MapStorage
+dburi: "postgres://golendar:golendar@localhost:5432"

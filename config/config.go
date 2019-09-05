@@ -12,6 +12,7 @@ type Config struct {
 	Port     string `yaml:"port"`
 	GRPCPort string `yaml:"grpcport"`
 	Storage  string `yaml:"storage"`
+	DBURI    string `yaml:"dburi"`
 }
 
 // LoadYamlConfig loads config from yaml file to struct

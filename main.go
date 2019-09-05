@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net"
 	"sync"
 
@@ -10,20 +11,28 @@ import (
 	"github.com/DanielTitkov/golendar/internal/event"
 	"github.com/DanielTitkov/golendar/internal/storage"
 	"github.com/DanielTitkov/golendar/logger"
+	"github.com/jmoiron/sqlx"
 )
 
-func mockEvents(s storage.Storage) {
+func mockEvents(s storage.Storage) error {
 	events := []event.Event{
 		{Title: "Foo", Desc: "FOOBAR"},
 		{Title: "Spam", Desc: "BAZINGA!"},
 		{Title: "Vookah", User: "Mack", Desc: "You gonna like it"},
 	}
 	for _, e := range events {
-		s.CreateEvent(e)
+		_, err := s.CreateEvent(e)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func main() {
+	// setup context
+	ctx := context.Context(context.Background())
+
 	// setup logger
 	l, err := logger.CreateLogger("./logger.json")
 	if err != nil {
@@ -38,12 +47,38 @@ func main() {
 
 	// setup storage
 	l.Infof("Using '%s' storage", c.Storage)
-	s, err := storage.PrepareStorage(c)
+	s, err := storage.PrepareStorage(ctx, c)
 	if err != nil {
 		l.Fatal(err)
 	}
 
-	mockEvents(s)
+	// mock data
+	if c.Storage == "Postgres" {
+		db, err := sqlx.Open("pgx", c.DBURI)
+		if err != nil {
+			l.Fatal(err)
+		}
+		initTableQuery := `
+			create table if not exists events (
+				id serial primary key,
+				UUID text not null,
+				title text,
+				datetime text,
+				duration text,
+				description text,
+				userid text,
+				notify text);
+		`
+		if _, err := db.Exec(initTableQuery); err != nil {
+			l.Fatal(err)
+		}
+		db.Close()
+	}
+
+	err = mockEvents(s)
+	if err != nil {
+		l.Fatalf("Data mocking failed: %v", err)
+	}
 
 	var wg sync.WaitGroup
 

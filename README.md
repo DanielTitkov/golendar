@@ -69,3 +69,24 @@ Method: DELETE
 Params: UUID (required)  
 Example: `DELETE /events?UUID=3405be29-2852-44fa-b8c1-5c5be22d0c0f HTTP/1.1`  
 
+## Using with postgres database
+
+Database connection string must be specified in config file and storage type must be "Postgres".
+
+```yaml
+storage: "Postgres"
+dburi: "postgres://golendar:golendar@localhost:5432"
+```
+
+You can run postgres in docker with the following command:
+
+```bash
+docker run --rm --name pg-docker -e POSTGRES_USER=golendar -e POSTGRES_PASSWORD=golendar -d -p 5432:5432 postgres
+```
+
+Add -v argument like shown bellow if you want to persist data.
+
+```bash
+-v $HOME/docker/volumes/postgres:/var/lib/postgresql/data 
+```
+
