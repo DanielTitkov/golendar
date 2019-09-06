@@ -16,7 +16,7 @@ type PGStorage struct {
 	Ctx context.Context
 }
 
-// Init setups map in MapStorage
+// Init opens connection with database
 func (pgs *PGStorage) Init() error {
 	db, err := sqlx.Open("pgx", pgs.URI)
 	if err != nil {
