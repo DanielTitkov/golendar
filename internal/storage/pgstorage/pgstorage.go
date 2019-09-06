@@ -99,10 +99,32 @@ func (pgs *PGStorage) CreateEvent(e event.Event) (event.Event, error) {
 
 // UpdateEvent rewrites event with given UUID
 func (pgs *PGStorage) UpdateEvent(eventUUID uuid.UUID, e event.Event) (event.Event, error) {
-	return event.Event{}, nil
+	sql := `update events set 
+		title = :title, 
+		datetime = :datetime, 
+		duration = :duration, 
+		description = :description, 
+		userid = :userid, 
+		notify = :notify
+	where uuid = :uuid`
+	_, err := pgs.DB.NamedExecContext(pgs.Ctx, sql, map[string]interface{}{
+		"uuid":        eventUUID.String(),
+		"title":       e.Title,
+		"datetime":    e.Datetime,
+		"duration":    e.Duration,
+		"description": e.Desc,
+		"userid":      e.User,
+		"notify":      e.Notify,
+	})
+	if err != nil {
+		return event.Event{}, err
+	}
+	return e, nil
 }
 
 // DeleteEvent deletes event with given UUID from storage
 func (pgs *PGStorage) DeleteEvent(eventUUID uuid.UUID) error {
-	return nil
+	sql := "delete from events where uuid = $1"
+	_, err := pgs.DB.ExecContext(pgs.Ctx, sql, eventUUID.String())
+	return err
 }
