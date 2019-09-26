@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/DanielTitkov/golendar/api/grpc"
 	"github.com/DanielTitkov/golendar/api/rest"
@@ -16,9 +17,9 @@ import (
 
 func mockEvents(s storage.Storage) error {
 	events := []event.Event{
-		{Title: "Foo", Desc: "FOOBAR"},
-		{Title: "Spam", Desc: "BAZINGA!"},
-		{Title: "Vookah", User: "Mack", Desc: "You gonna like it"},
+		{Title: "Foo", Desc: "FOOBAR", Notify: true, Datetime: time.Now()},
+		{Title: "Spam", Desc: "BAZINGA!", Notify: false, Datetime: time.Now()},
+		{Title: "Vookah", User: "Mack", Desc: "You gonna like it", Notify: true, Datetime: time.Now()},
 	}
 	for _, e := range events {
 		_, err := s.CreateEvent(e)
@@ -63,11 +64,11 @@ func main() {
 				id serial primary key,
 				UUID text not null,
 				title text,
-				datetime text,
+				datetime timestamp,
 				duration text,
 				description text,
 				userid text,
-				notify text);
+				notify boolean);
 		`
 		if _, err := db.Exec(initTableQuery); err != nil {
 			l.Fatal(err)

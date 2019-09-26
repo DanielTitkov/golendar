@@ -81,7 +81,7 @@ dburi: "postgres://golendar:golendar@localhost:5432"
 You can run postgres in docker with the following command:
 
 ```bash
-docker run --rm --name pg-docker -e POSTGRES_USER=golendar -e POSTGRES_PASSWORD=golendar -d -p 5432:5432 postgres
+docker run --rm --name pg -e POSTGRES_USER=golendar -e POSTGRES_PASSWORD=golendar -d -p 5432:5432 postgres
 ```
 
 Add -v argument like shown bellow if you want to persist data.
@@ -89,4 +89,23 @@ Add -v argument like shown bellow if you want to persist data.
 ```bash
 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data 
 ```
+
+## Using notifications sender
+
+Notification sender consists of two daemons which can be found in cmd/daemons folder. It requires RabbitMQ to operate. 
+
+RabbitMQ can be launched in docker:
+```bash
+docker run -d --hostname my-rabbit --name rmq -e RABBITMQ_DEFAULT_USER=golendar -e RABBITMQ_DEFAULT_PASS=golendar -d -p 5672:5672 rabbitmq:3
+```
+
+As RabbitMQ is ready launch daemons:
+```bash
+go run cmd/daemons/creator/notificaions_creator.go 
+```
+```bash
+go run cmd/daemons/sender/notifications_sender.go
+```
+
+Now if new event will be created (via rest api for example), notification sender will get the message. Notifications are send only once for each event. Time interval for notifications can be set in config.yaml (in minutes). Please mind that discrepancies in docker timezone (for Postgres) and host machine can lead to unwanted behaviour. No timezone control is implemented. 
 

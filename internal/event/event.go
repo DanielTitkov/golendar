@@ -1,6 +1,8 @@
 package event
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -8,9 +10,9 @@ import (
 type Event struct {
 	UUID     uuid.UUID `db:"uuid"`
 	Title    string
-	Datetime string
+	Datetime time.Time
 	Duration string
 	Desc     string `db:"description"`
 	User     string `db:"userid"`
-	Notify   string
+	Notify   bool
 }

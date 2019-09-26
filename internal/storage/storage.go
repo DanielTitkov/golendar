@@ -20,6 +20,7 @@ type Storage interface {
 	CreateEvent(e event.Event) (event.Event, error)
 	UpdateEvent(eventUUID uuid.UUID, e event.Event) (event.Event, error)
 	DeleteEvent(eventUUID uuid.UUID) error
+	GetUpcomingEvents(interval int) ([]event.Event, error)
 }
 
 // PrepareStorage setups storage based on config

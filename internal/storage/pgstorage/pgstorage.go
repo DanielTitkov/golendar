@@ -2,6 +2,7 @@ package pgstorage
 
 import (
 	"context"
+	"time"
 
 	"github.com/DanielTitkov/golendar/internal/event"
 	"github.com/google/uuid"
@@ -11,9 +12,9 @@ import (
 
 // PGStorage is struct for postgres storage
 type PGStorage struct {
+	Ctx context.Context
 	URI string
 	DB  *sqlx.DB
-	Ctx context.Context
 }
 
 // Init opens connection with database
@@ -62,11 +63,11 @@ func (pgs *PGStorage) GetEvent(eventUUID uuid.UUID) (event.Event, error) {
 	e := event.Event{
 		UUID:     eventUUID,
 		Title:    res["title"].(string),
-		Datetime: res["datetime"].(string),
+		Datetime: res["datetime"].(time.Time),
 		Duration: res["duration"].(string),
 		Desc:     res["description"].(string),
 		User:     res["userid"].(string),
-		Notify:   res["notify"].(string),
+		Notify:   res["notify"].(bool),
 	}
 	return e, nil
 }
@@ -127,4 +128,35 @@ func (pgs *PGStorage) DeleteEvent(eventUUID uuid.UUID) error {
 	sql := "delete from events where uuid = $1"
 	_, err := pgs.DB.ExecContext(pgs.Ctx, sql, eventUUID.String())
 	return err
+}
+
+// GetUpcomingEvents returns events for given amount of minutes
+func (pgs *PGStorage) GetUpcomingEvents(interval int) ([]event.Event, error) {
+	sql := `
+	SELECT 
+		uuid, title, datetime, duration, description, userid, notify
+	FROM events 
+	WHERE 
+		datetime < (NOW() + $1 * INTERVAL '1 minutes') 
+		AND notify = true;`
+	rows, err := pgs.DB.QueryxContext(pgs.Ctx, sql, interval)
+	if err != nil {
+		return []event.Event{}, err
+	}
+	defer rows.Close()
+
+	events := []event.Event{}
+
+	for rows.Next() {
+		var e event.Event
+		err := rows.StructScan(&e)
+		if err != nil {
+			return []event.Event{}, err
+		}
+		events = append(events, e)
+	}
+	if err := rows.Err(); err != nil {
+		return []event.Event{}, err
+	}
+	return events, nil
 }

@@ -13,6 +13,8 @@ type Config struct {
 	GRPCPort string `yaml:"grpcport"`
 	Storage  string `yaml:"storage"`
 	DBURI    string `yaml:"dburi"`
+	Notify   int    `yaml:"notify"`
+	MQURI    string `yaml:"mquri"`
 }
 
 // LoadYamlConfig loads config from yaml file to struct

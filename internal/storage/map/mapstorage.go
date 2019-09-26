@@ -68,3 +68,8 @@ func (mapStorage *MapStorage) DeleteEvent(eventUUID uuid.UUID) error {
 	delete(mapStorage.M, eventUUID)
 	return nil
 }
+
+// GetUpcomingEvents is not supported by map storage
+func (mapStorage *MapStorage) GetUpcomingEvents(interval int) ([]event.Event, error) {
+	return []event.Event{}, errors.New("Method is not supported by Map Storage")
+}
