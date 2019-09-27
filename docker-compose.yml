@@ -21,6 +21,20 @@ services:
     env_file:
       - .env.dist
 
+  backend:
+    build: ./
+    ports:
+        - '3000:3000'
+    expose:
+        - '3000'
+    depends_on:
+        - postgres
+        - rabbitmq
+    networks:
+      - golendar_net
+    env_file:
+        - .env
+
 networks:
   golendar_net:
     driver: "bridge"
