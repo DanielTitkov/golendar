@@ -59,6 +59,7 @@ func main() {
 		}
 	}()
 
+	l.Info("Golendar Notification Sender up and running")
 	l.Info("Waiting for messages")
 	<-forever
 }

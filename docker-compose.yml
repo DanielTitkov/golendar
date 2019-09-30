@@ -4,9 +4,7 @@ services:
 
   rabbitmq:
     image: "rabbitmq:3"
-    hostname: rabbit_node_1
-    ports:
-      - "5672:5672"
+    hostname: rabbitmq
     networks:
       - golendar_net
     env_file:
@@ -14,26 +12,45 @@ services:
 
   postgres:
     image: "postgres"
-    ports:
-      - "5432:5432"
     networks:
       - golendar_net
     env_file:
       - .env.dist
 
-  backend:
+  api:
+    restart: unless-stopped
     build: ./
     ports:
         - '3000:3000'
-    expose:
-        - '3000'
     depends_on:
         - postgres
         - rabbitmq
     networks:
       - golendar_net
-    env_file:
-        - .env
+
+  notifications_creator:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: ./cmd/daemons/creator/Dockerfile
+    depends_on:
+        - postgres
+        - rabbitmq
+        - api
+    networks:
+      - golendar_net
+
+  notifications_sender:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: ./cmd/daemons/sender/Dockerfile
+    depends_on:
+        - postgres
+        - rabbitmq
+        - api
+    networks:
+      - golendar_net
 
 networks:
   golendar_net:

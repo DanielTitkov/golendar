@@ -96,7 +96,7 @@ Notification sender consists of two daemons which can be found in cmd/daemons fo
 
 RabbitMQ can be launched in docker:
 ```bash
-docker run -d --hostname my-rabbit --name rmq -e RABBITMQ_DEFAULT_USER=golendar -e RABBITMQ_DEFAULT_PASS=golendar -d -p 5672:5672 rabbitmq:3
+docker run -d --hostname rabbit --name rmq -e RABBITMQ_DEFAULT_USER=golendar -e RABBITMQ_DEFAULT_PASS=golendar -d -p 5672:5672 rabbitmq:3
 ```
 
 As RabbitMQ is ready launch daemons:

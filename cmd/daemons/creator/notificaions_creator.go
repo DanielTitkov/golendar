@@ -85,8 +85,9 @@ func main() {
 	defer conn.Close()
 	defer ch.Close()
 
-	// get events
+	l.Info("Golendar Notification Creator up and running")
 
+	// get events
 	for range time.NewTicker(5 * time.Second).C {
 		events, err := s.GetUpcomingEvents(c.Notify)
 		l.Infof("Fetching events, got %d", len(events))

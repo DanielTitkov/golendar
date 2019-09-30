@@ -4,4 +4,4 @@ grpcport: 50051
 storage: "Postgres" # or MapStorage
 dburi: "postgres://golendar:golendar@postgres:5432"
 notify: 15 # minutes
-mquri: "amqp://golendar:golendar@rabbitmq:5672/"
+mquri: "amqp://golendar:golendar@rabbitmq:5672"
