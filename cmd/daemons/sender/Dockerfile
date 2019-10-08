@@ -1,5 +1,12 @@
+# get dependencies
+FROM golang:1.13 AS dependencies
+WORKDIR /app
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+
 # build stage
-FROM golang:latest AS build-stage
+FROM dependencies AS build-stage
 WORKDIR /app
 COPY . . 
 RUN cd ./cmd/daemons/sender/ && CGO_ENABLED=0 GOOS=linux go build -o ns
