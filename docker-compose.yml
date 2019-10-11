@@ -52,6 +52,19 @@ services:
     networks:
       - golendar_net
 
+  integration_tests:
+    build:
+      context: ./
+      dockerfile: ./tests/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+      - api
+      - notifications_sender
+      - notifications_creator
+    networks:
+      - golendar_net
+
 networks:
   golendar_net:
     driver: "bridge"
