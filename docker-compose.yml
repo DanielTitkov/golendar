@@ -12,6 +12,8 @@ services:
 
   postgres:
     image: "postgres"
+    ports: 
+      - '5432:5432'
     networks:
       - golendar_net
     env_file:
@@ -49,19 +51,6 @@ services:
       - postgres
       - rabbitmq
       - api
-    networks:
-      - golendar_net
-
-  integration_tests:
-    build:
-      context: ./
-      dockerfile: ./tests/Dockerfile
-    depends_on:
-      - postgres
-      - rabbitmq
-      - api
-      - notifications_sender
-      - notifications_creator
     networks:
       - golendar_net
 
