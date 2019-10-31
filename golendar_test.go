@@ -63,6 +63,34 @@ func clearTable(app *App) error {
 	return nil
 }
 
+func validateEvent(t *testing.T, resultData map[string]interface{}, expectedData map[string]interface{}) {
+	// Check if all user fields are present and correct
+	for k, v := range expectedData {
+		got, ok := resultData[k]
+		if !ok || got != v {
+			t.Errorf("Expected %v of type %T, got %v of type %T, at %v", v, v, got, got, resultData)
+		}
+	}
+
+	// Check if automated fields are present and valid - UUID
+	if uid, ok := resultData["UUID"]; ok {
+		if _, err := uuid.Parse(uid.(string)); err != nil {
+			t.Errorf("Expected valid UUID, got %v in %v with parsing error %v", uid, resultData, err)
+		}
+	} else {
+		t.Errorf("Expected UUID present, got %v", resultData)
+	}
+
+	// Check if automated fields are present and valid - Datetime
+	if dt, ok := resultData["Datetime"]; ok {
+		if _, err := time.Parse("2006-01-02T15:04:05Z", dt.(string)); err != nil {
+			t.Errorf("Expected valid Datetime, got %v with error %v", dt, err)
+		}
+	} else {
+		t.Errorf("Expected Datetime present, got %v", resultData)
+	}
+}
+
 func TestGetEvents(t *testing.T) {
 	err := setup(true)
 	if err != nil {
@@ -71,6 +99,8 @@ func TestGetEvents(t *testing.T) {
 
 	client := &http.Client{}
 	url := apiURL + eventEndpoint
+
+	// Get events
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		t.Error("Failed to make request:", err)
@@ -80,6 +110,8 @@ func TestGetEvents(t *testing.T) {
 		t.Error("Failed to do request:", err)
 	}
 	defer resp.Body.Close()
+
+	// Check if status code is correct
 	if resp.StatusCode != 200 {
 		t.Errorf("Expected status code 200, got %d", resp.StatusCode)
 	}
@@ -111,14 +143,9 @@ func TestGetEvents(t *testing.T) {
 		},
 	}
 
+	// Check if all field are correct
 	for i, m := range expected {
-		for k, v := range m {
-			r := results[i]
-			got, ok := r[k]
-			if !ok || got != v {
-				t.Errorf("Expected %v of type %T, got %v of type %T, at %v", v, v, got, got, r)
-			}
-		}
+		validateEvent(t, results[i], m)
 	}
 }
 
@@ -128,6 +155,9 @@ func TestPostEventAndGetResponse(t *testing.T) {
 		t.Error("Setup failed:", err)
 	}
 
+	client := &http.Client{}
+	url := apiURL + eventEndpoint
+
 	eventData := map[string]interface{}{
 		"Title":    "MOOOOOOOOOOOOOOOOOOOOOOSGGGGGGGGGGGGGGGHHHHHHHHHHH",
 		"User":     "Mack",
@@ -136,8 +166,7 @@ func TestPostEventAndGetResponse(t *testing.T) {
 		"Datetime": "2019-09-26T15:15:00Z",
 	}
 
-	client := &http.Client{}
-	url := apiURL + eventEndpoint
+	// Post new event to api
 	var reqBody bytes.Buffer
 	json.NewEncoder(&reqBody).Encode(eventData)
 	req, err := http.NewRequest("POST", url, &reqBody)
@@ -159,31 +188,7 @@ func TestPostEventAndGetResponse(t *testing.T) {
 		t.Error("Failed to unmarshal json:", err)
 	}
 
-	// Check if all user fields are present and correct
-	for k, v := range eventData {
-		got, ok := result[k]
-		if !ok || got != v {
-			t.Errorf("Expected %v of type %T, got %v of type %T, at %v", v, v, got, got, result)
-		}
-	}
-
-	// Check if automated fields are present and valid
-	// UUID
-	if uid, ok := result["UUID"]; ok {
-		if _, err := uuid.Parse(uid.(string)); err != nil {
-			t.Errorf("Expected valid UUID, got %v in %v with parsing error %v", uid, result, err)
-		}
-	} else {
-		t.Errorf("Expected UUID present, got %v", result)
-	}
-	// Datetime
-	if dt, ok := result["Datetime"]; ok {
-		if _, err := time.Parse("2006-01-02T15:04:05Z", dt.(string)); err != nil {
-			t.Errorf("Expected valid Datetime, got %v with error %v", dt, err)
-		}
-	} else {
-		t.Errorf("Expected Datetime present, got %v", result)
-	}
+	validateEvent(t, result, eventData)
 }
 
 func TestPostEventAndSaveToDB(t *testing.T) {
@@ -239,28 +244,13 @@ func TestPostEventAndSaveToDB(t *testing.T) {
 
 	// Check if all user fields are present and correct
 	result := results[0]
-	for k, v := range eventData {
-		got, ok := result[k]
-		if !ok || got != v {
-			t.Errorf("Expected %v of type %T, got %v of type %T, at %v", v, v, got, got, result)
-		}
-	}
+	validateEvent(t, result, eventData)
+}
 
-	// Check if automated fields are present and valid
-	// UUID
-	if uid, ok := result["UUID"]; ok {
-		if _, err := uuid.Parse(uid.(string)); err != nil {
-			t.Errorf("Expected valid UUID, got %v in %v with parsing error %v", uid, result, err)
-		}
-	} else {
-		t.Errorf("Expected UUID present, got %v", result)
-	}
-	// Datetime
-	if dt, ok := result["Datetime"]; ok {
-		if _, err := time.Parse("2006-01-02T15:04:05Z", dt.(string)); err != nil {
-			t.Errorf("Expected valid Datetime, got %v with error %v", dt, err)
-		}
-	} else {
-		t.Errorf("Expected Datetime present, got %v", result)
-	}
+func TestDeleteEvent(t *testing.T) {
+
+}
+
+func TestUpdateEvent(t *testing.T) {
+
 }
